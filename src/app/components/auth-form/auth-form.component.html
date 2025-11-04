@@ -1,0 +1,94 @@
+<!-- src/app/components/auth-form/auth-form.component.html -->
+
+<section class="w-full bg-white">
+  <!-- عرض ديناميكي حسب النوع -->
+  <div class="mx-auto w-full"
+    [ngClass]="isSignUp() ? 'max-w-[680px] px-6 sm:px-10 lg:px-14 ' : 'max-w-[680px] px-6 sm:px-10 lg:px-14 '">
+    <!-- Header -->
+    <header class="flex flex-col gap-5 md:gap-8 mb-2 ">
+      <a routerLink="/" class="flex items-center gap-1 cursor-pointer">
+        <img src="assets/icons/logo.svg" alt="logo" width="34" height="34" />
+        <h1 class="text-26 font-ibm-plex-serif font-bold text-black-1">HORIZON</h1>
+      </a>
+
+      <div class="flex flex-col gap-1 md:gap-3">
+        <h1 class="text-24 lg:text-36 font-semibold text-gray-900">
+          {{ user() ? 'Link Account' : (isSignUp() ? 'Sign up' : 'Sign in') }}
+        </h1>
+        <p class="text-16 font-normal text-gray-600">
+          {{ user() ? 'Link your account to get started' : 'Please enter your details.' }}
+        </p>
+      </div>
+    </header>
+
+    <!-- Form -->
+    <form [formGroup]="form" (ngSubmit)="submit()" class="flex flex-col gap-6">
+      <!-- فقط في Sign up -->
+      <ng-container *ngIf="isSignUp()">
+        <div class="flex gap-4 max-sm:flex-col">
+          <app-form-field class="flex-1" label="First Name" [control]="form.get('firstName')">
+            <app-input formControlName="firstName" />
+          </app-form-field>
+          <app-form-field class="flex-1" label="Last Name" [control]="form.get('lastName')">
+            <app-input formControlName="lastName" />
+          </app-form-field>
+        </div>
+
+        <app-form-field label="Address" [control]="form.get('address1')">
+          <app-input formControlName="address1" placeholder="Specific address" />
+        </app-form-field>
+
+        <!-- City alone -->
+        <app-form-field label="City" [control]="form.get('city')">
+          <app-input formControlName="city" />
+        </app-form-field>
+
+        <!-- Postal Code (left) + State (right) -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <app-form-field label="Postal Code" [control]="form.get('postalCode')">
+            <app-input formControlName="postalCode" placeholder="ex: 11101" />
+          </app-form-field>
+          <app-form-field label="State" [control]="form.get('state')">
+            <app-input formControlName="state" placeholder="ex: NY" />
+          </app-form-field>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <app-form-field label="Date of Birth" [control]="form.get('dateOfBirth')">
+            <app-input type="date" formControlName="dateOfBirth" placeholder="yyyy-mm-dd" />
+          </app-form-field>
+          <app-form-field label="SSN" [control]="form.get('ssn')">
+            <app-input formControlName="ssn" placeholder="ex: 1234" />
+          </app-form-field>
+        </div>
+      </ng-container>
+
+      <!-- داخل auth-form.component.html -->
+      <app-form-field label="Email" [control]="form.get('email')">
+        <app-input formControlName="email" />
+      </app-form-field>
+
+      <app-form-field  label="Password" [control]="form.get('password')">
+        <app-input type="password" formControlName="password" />
+      </app-form-field>
+
+      
+
+      <button appButton type="submit" class="form-btn">
+        {{ isLoading() ? 'Loading...' : (isSignUp() ? 'Sign up' : 'Sign in') }}
+      </button>
+
+      <!-- Footer link حسب الصفحة -->
+      <p class="pt-1 text-center text-sm text-slate-600">
+        <ng-container *ngIf="isSignUp(); else signinFooter">
+          Already have an account?
+          <a class="font-medium text-indigo-600 hover:underline" routerLink="/auth/sign-in">Sign in</a>
+        </ng-container>
+        <ng-template #signinFooter>
+          Don’t have an account?
+          <a class="font-medium text-indigo-600 hover:underline" routerLink="/auth/sign-up">Sign up</a>
+        </ng-template>
+      </p>
+    </form>
+  </div>
+</section>
