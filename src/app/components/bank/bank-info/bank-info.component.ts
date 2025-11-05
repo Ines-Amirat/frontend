@@ -22,7 +22,7 @@ import { formatAmount, getAccountTypeColors } from '../../../core/utils/utils';
     >
       <figure class="flex-center h-fit rounded-full bg-blue-100" [ngClass]="colors().lightBg">
         <img
-          ngSrc="/icons/connect-bank.svg"
+          ngSrc="icons/connect-bank.svg"
           width="20"
           height="20"
           [alt]="account?.subtype || 'bank icon'"

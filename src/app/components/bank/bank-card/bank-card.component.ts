@@ -42,13 +42,13 @@ export interface Account {
           </article>
         </div>
 
-        <div class="bank-card_icon">
-          <img src="/assets/icons/Paypass.svg" width="20" height="24" alt="Paypass" />
-          <img src="/assets/icons/mastercard.svg" width="45" height="32" alt="visa" />
+        <div class="bank-card_icons ">
+          <img src="assets/icons/Paypass.svg" width="20" height="24" alt="Paypass" />
+          <img src="assets/icons/mastercard.svg" width="45" height="32" alt="visa" />
         </div>
 
         <img
-          src="/icons/lines.png"
+          src="assets/icons/lines.png"
           width="316"
           height="190"
           alt="lines"

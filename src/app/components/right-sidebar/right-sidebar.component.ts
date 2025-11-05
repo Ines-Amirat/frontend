@@ -38,7 +38,7 @@ import { CategoryComponent } from '../ui/category/category.component';
           <h2 class="header-2">My Banks</h2>
 
           <a routerLink="/" class="flex gap-2 items-center">
-            <img src="/icons/plus.svg" width="20" height="20" alt="plus icon" />
+            <img src="assets/icons/plus.svg" width="20" height="20" alt="plus icon" />
             <h2 class="text-14 font-semibold text-gray-600">Add Bank</h2>
           </a>
         </div>
