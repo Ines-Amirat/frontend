@@ -31,7 +31,7 @@ import { AuthServiceService } from '../../../core/services/auth-service.service'
 export class DashboardLayoutComponent {
   user: any; // will hold the signal from AuthServiceService
 
-  constructor(private readonly auth: AuthServiceService) {
+  constructor(private readonly auth:AuthServiceService) {
     this.user = this.auth.user; // assign after auth is initialized
   }
 }

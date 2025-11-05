@@ -2,18 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { Transaction } from '../models';
+import { Account } from '../models';
 import { environment } from '../../../environments/environments';
 
 @Injectable({ providedIn: 'root' })
-export class TransactionsService {
+export class AccountsService {
   private base = environment.apiBaseUrl;
   constructor(private http: HttpClient) {}
 
-  list(): Observable<Transaction[]> {
+  getAll(): Observable<Account[]> {
     if (environment.useMock) {
-      return this.http.get<Transaction[]>('assets/mocks/transactions.json');
+      return this.http.get<Account[]>('assets/mocks/accounts.json');
     }
-    return this.http.get<Transaction[]>(`${this.base}/transactions`);
+    return this.http.get<Account[]>(`${this.base}/accounts`);
   }
 }
