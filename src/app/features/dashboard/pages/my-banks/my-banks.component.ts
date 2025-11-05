@@ -1,17 +1,16 @@
 import { Component, OnInit, computed, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { Router } from '@angular/router';
+
 import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-box.component';
 import { BankCardComponent } from '../../../../components/bank/bank-card/bank-card.component';
 import { Account, User } from '../../../../core/models';
 import { AccountsService } from '../../../../core/services/accounts.service';
 import { AuthServiceService } from '../../../../core/services/auth-service.service';
 
-
-
 @Component({
-  standalone: true,
-  selector: 'app-my-banks-page',
+  selector: 'app-my-banks',
+  standalone: true,                       
   imports: [CommonModule, CurrencyPipe, HeaderBoxComponent, BankCardComponent],
   template: `
     <section class="flex">
@@ -31,7 +30,7 @@ import { AuthServiceService } from '../../../../core/services/auth-service.servi
           <ng-template #content>
             <div *ngIf="error(); else cards" class="text-sm text-red-600">{{ error() }}</div>
             <ng-template #cards>
-              <div class="flex flex-wrap gap-6">
+              <div class="flex flex-wrap gap-6 border border-transparent"> <!-- debug border if needed -->
                 <app-bank-card
                   *ngFor="let account of accounts()"
                   [account]="account"
@@ -39,7 +38,6 @@ import { AuthServiceService } from '../../../../core/services/auth-service.servi
                 </app-bank-card>
               </div>
 
-              <!-- Optionnel: récap -->
               <div class="mt-6 text-sm text-gray-600">
                 <span>Total banks: {{ totalBanks() }}</span> ·
                 <span>Total balance: {{ totalCurrentBalance() | currency:'USD' }}</span>
@@ -52,13 +50,11 @@ import { AuthServiceService } from '../../../../core/services/auth-service.servi
   `
 })
 export class MyBanksComponent implements OnInit {
-  // state
   user = signal<User | null>(null);
   accounts = signal<Account[]>([]);
   loading = signal(true);
   error = signal('');
 
-  // dérivés
   totalBanks = computed(() => this.accounts().length);
   totalCurrentBalance = computed(() =>
     this.accounts().reduce((sum, a) => sum + Number(a.currentBalance || 0), 0)
@@ -69,19 +65,17 @@ export class MyBanksComponent implements OnInit {
     private accountsSvc: AccountsService,
     private router: Router
   ) {}
-   
-ngOnInit(): void {
-  const u = this.auth.user(); // ton signal readonly
-  if (!u) {
-    this.router.navigate(['/sign-in']);
-    return;
+
+  ngOnInit(): void {
+    const u = this.auth.user();
+    if (!u) { this.router.navigate(['/sign-in']); return; }
+    this.user.set(u);
+
+    this.accountsSvc.getAll().subscribe({
+      next: (data) => { this.accounts.set(data); this.loading.set(false); },
+      error: () => { this.error.set('Failed to load accounts'); this.loading.set(false); }
+    });
   }
-  this.user.set(u);
-
-  this.accountsSvc.getAll().subscribe({
-    next: (data) => { this.accounts.set(data); this.loading.set(false); },
-    error: () => { this.error.set('Failed to load accounts'); this.loading.set(false); }
-  });
 }
 
-}
+

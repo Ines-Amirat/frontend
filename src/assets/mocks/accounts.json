@@ -25,5 +25,18 @@
     "subtype": "savings",
     "appwriteItemId": "itm_sg_1",
     "sharableId": "shr-sg-1"
+  },
+  {
+    "id": "acc_2",
+    "availableBalance": 1000.00,
+    "currentBalance": 1000.00,
+    "officialName": "Société Générale Standard",
+    "mask": "1111",
+    "institutionId": "sg",
+    "name": "Société Générale",
+    "type": "depository",
+    "subtype": "savings",
+    "appwriteItemId": "itm_sg_1",
+    "sharableId": "shr-sg-1"
   }
 ]

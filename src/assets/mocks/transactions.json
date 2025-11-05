@@ -1,53 +1,26 @@
 [
-  {
-    "id": "tx_1",
-    "$id": "tx_1",
-    "name": "Payment Amazon",
-    "paymentChannel": "card",
-    "type": "EXPENSE",
-    "accountId": "acc_1",
-    "amount": -85.99,
-    "pending": false,
-    "category": "Shopping",
-    "date": "2024-11-01T01:00:00Z",
-    "image": "",
-    "$createdAt": "2024-11-01T01:01:00Z",
-    "channel": "Online",
-    "senderBankId": "acc_1",
-    "receiverBankId": "ext_merchant"
-  },
-  {
-    "id": "tx_2",
-    "$id": "tx_2",
-    "name": "Salary Company",
-    "paymentChannel": "transfer",
-    "type": "INCOME",
-    "accountId": "acc_1",
-    "amount": 2000.0,
-    "pending": false,
-    "category": "Income",
-    "date": "2024-10-29T01:00:00Z",
-    "image": "",
-    "$createdAt": "2024-10-29T01:01:00Z",
-    "channel": "Deposit",
-    "senderBankId": "ext_company",
-    "receiverBankId": "acc_1"
-  },
-  {
-    "id": "tx_3",
-    "$id": "tx_3",
-    "name": "McDonalds",
-    "paymentChannel": "card",
-    "type": "EXPENSE",
-    "accountId": "acc_2",
-    "amount": -12.0,
-    "pending": false,
-    "category": "Food and Drink",
-    "date": "2024-10-13T02:00:00Z",
-    "image": "",
-    "$createdAt": "2024-10-13T02:01:00Z",
-    "channel": "In Store",
-    "senderBankId": "acc_2",
-    "receiverBankId": "ext_merchant"
-  }
+  { "id": "tx_1", "name": "Uber 072515 SFPOOL", "paymentChannel": "Online", "type": "debit",
+    "accountId": "acc_1", "amount": 6.33, "pending": false, "category": "Rides",
+    "date": "2024-10-29T01:00:00Z", "image": "", "$createdAt": "2024-10-29T01:01:00Z",
+    "channel": "Online", "senderBankId": "acc_1", "receiverBankId": "ext_merchant" },
+
+  { "id": "tx_2", "name": "Uber 063015 SFPOOL", "paymentChannel": "Online", "type": "debit",
+    "accountId": "acc_1", "amount": 5.40, "pending": false, "category": "Rides",
+    "date": "2024-10-16T02:00:00Z", "image": "", "$createdAt": "2024-10-16T02:01:00Z",
+    "channel": "Online", "senderBankId": "acc_1", "receiverBankId": "ext_merchant" },
+
+  { "id": "tx_3", "name": "United Airlines", "paymentChannel": "In Store", "type": "debit",
+    "accountId": "acc_1", "amount": -500.00, "pending": false, "category": "Travel",
+    "date": "2024-10-14T02:00:00Z", "image": "", "$createdAt": "2024-10-14T02:01:00Z",
+    "channel": "In Store", "senderBankId": "acc_1", "receiverBankId": "ext_merchant" },
+
+  { "id": "tx_4", "name": "McDonalds", "paymentChannel": "In Store", "type": "debit",
+    "accountId": "acc_1", "amount": 12.00, "pending": false, "category": "Food and Drink",
+    "date": "2024-10-13T02:00:00Z", "image": "", "$createdAt": "2024-10-13T02:01:00Z",
+    "channel": "In Store", "senderBankId": "acc_1", "receiverBankId": "ext_merchant" },
+
+  { "id": "tx_5", "name": "Salary Company", "paymentChannel": "Deposit", "type": "credit",
+    "accountId": "acc_1", "amount": 2000.00, "pending": false, "category": "Income",
+    "date": "2024-10-29T01:00:00Z", "image": "", "$createdAt": "2024-10-29T01:01:00Z",
+    "channel": "Deposit", "senderBankId": "ext_company", "receiverBankId": "acc_1" }
 ]
