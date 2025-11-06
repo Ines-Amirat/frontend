@@ -206,13 +206,15 @@ class TransactionsApi {
 
       <!-- submit -->
       <div class="payment-transfer_btn-box">
-        <button type="submit" class="payment-transfer_btn" [disabled]="isLoading() || form.invalid">
+        <button type="submit" class="payment-transfer_btn">
           <ng-container *ngIf="isLoading(); else idle">
             <span class="animate-spin inline-block h-4 w-4 mr-2 border border-current border-t-transparent rounded-full"></span>
             Sending...
           </ng-container>
           <ng-template #idle>Transfer Funds</ng-template>
         </button>
+
+        
       </div>
     </form>
   `,

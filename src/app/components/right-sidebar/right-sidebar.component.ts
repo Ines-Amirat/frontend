@@ -2,7 +2,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BankCardComponent } from '../bank/bank-card/bank-card.component';
-import { Account, Bank, CategoryCount, Transaction, User } from '../../core/models';
+import { Account, CategoryCount, Transaction, User } from '../../core/models';
 import { countTransactionCategories } from '../../core/utils/utils';
 import { CategoryComponent } from '../ui/category/category.component';
 
@@ -10,7 +10,7 @@ import { CategoryComponent } from '../ui/category/category.component';
 @Component({
   selector: 'app-right-sidebar',
   standalone: true,
-  imports: [ RouterModule, BankCardComponent, CategoryComponent],
+  imports: [RouterModule, BankCardComponent, CategoryComponent],
   template: `
     <aside class="right-sidebar">
       <!-- 🧑‍💼 Profil utilisateur -->
@@ -58,6 +58,7 @@ import { CategoryComponent } from '../ui/category/category.component';
               [userName]="user?.firstName + ' ' + user?.lastName"
               [showBalance]="false"
             ></app-bank-card>
+            
           </div>
         </div>
 
@@ -80,6 +81,9 @@ export class RightSidebarComponent implements OnInit {
   @Input() user!: User;
   @Input() transactions: Transaction[] = [];
   @Input({ required: true }) banks!: Account[];
+
+
+
 
 
   categories: CategoryCount[] = [];

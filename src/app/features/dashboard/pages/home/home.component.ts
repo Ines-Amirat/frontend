@@ -145,7 +145,6 @@ export class HomeComponent implements OnInit {
       }
     ];
 
-    // 💾 Injecter les mock data
     this.accounts.set(mockAccounts);
     this.totals.set({
       totalBanks: mockAccounts.length,
