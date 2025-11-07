@@ -66,9 +66,12 @@ export function formatAmount(amount: number): string {
 /** Helpers génériques */
 export const parseStringify = (value: any) => JSON.parse(JSON.stringify(value));
 
-export const removeSpecialCharacters = (value: string) => {
-  return value.replace(/[^\w\s]/gi, '');
+
+export const removeSpecialCharacters = (value?: string) => {
+  return (value ?? '').replace(/[^\w\s]/gi, '');
 };
+
+
 
 /** Build d’URL avec query params (équivalent de formUrlQuery Next) */
 interface UrlQueryParams {
@@ -118,26 +121,23 @@ export function getAccountTypeColors(type: AccountTypes) {
   }
 }
 
-/** Compter les catégories des transactions */
-export function countTransactionCategories(
-  transactions: Transaction[]
-): CategoryCount[] {
+export function countTransactionCategories(transactions: Transaction[] = []): CategoryCount[] {
   const categoryCounts: Record<string, number> = {};
   let totalCount = 0;
 
-  transactions?.forEach((t) => {
-    const category = t.category;
-    if (Object.prototype.hasOwnProperty.call(categoryCounts, category)) {
-      categoryCounts[category]++;
+  transactions.forEach((t) => {
+    const key = (t.category ?? 'OTHER') as string;
+    if (Object.prototype.hasOwnProperty.call(categoryCounts, key)) {
+      categoryCounts[key]++;
     } else {
-      categoryCounts[category] = 1;
+      categoryCounts[key] = 1;
     }
     totalCount++;
   });
 
-  const aggregated: CategoryCount[] = Object.keys(categoryCounts).map((category) => ({
-    name: category,
-    count: categoryCounts[category],
+  const aggregated: CategoryCount[] = Object.keys(categoryCounts).map((key) => ({
+    name: key,
+    count: categoryCounts[key],
     totalCount,
   }));
 

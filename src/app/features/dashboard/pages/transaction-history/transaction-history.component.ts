@@ -3,13 +3,11 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 
-
-
 import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-box.component';
 import { AuthServiceService } from '../../../../core/services/auth-service.service';
 import { AccountsService } from '../../../../core/services/accounts.service';
 import { TransactionsService } from '../../../../core/services/transaction.service';
-import { Account, Transaction, User } from '../../../../core/models';
+import {  BankAccount, Transaction, User } from '../../../../core/models';
 import { BankDropdownComponent } from '../../../../components/bank/bank-drop-dwon/bank-drop-dwon.component';
 import { TransactionHistoryTableComponent } from '../../../../components/transactions/transaction-history-table/transaction-history-table.component';
 
@@ -33,8 +31,9 @@ import { TransactionHistoryTableComponent } from '../../../../components/transac
 
 
       <app-bank-dropdown
-  [accounts]="accounts()"
-  (changed)="onSelectAccountId($event.appwriteItemId)">
+        [accounts]="accounts()" (changed)="onSelectAccountId($event.id)">
+        
+
 </app-bank-dropdown>
 
     </div>
@@ -44,12 +43,13 @@ import { TransactionHistoryTableComponent } from '../../../../components/transac
       <div class="transactions-account rounded-xl bg-blue-600 text-white p-5 flex items-center justify-between">
         <div class="flex flex-col gap-2">
           <h2 class="text-lg font-bold">{{ account()?.name || '—' }}</h2>
-          <p class="text-sm text-blue-100">{{ account()?.officialName || '—' }}</p>
-          <p class="text-sm font-medium text-blue-100">●●●● ●●●● ●●●● {{ account()?.mask }}</p>
+          <p class="text-sm text-blue-100">{{ account()?.bankName || '—' }}</p>
+          <p class="text-sm font-medium text-blue-100">●●●● ●●●● ●●●● {{ account()?.maskedNumber }}</p>
+
         </div>
         <div class="transactions-account-balance text-right">
           <p class="text-sm">Current Balance</p>
-          <p class="text-2xl font-bold">{{ account()?.currentBalance | currency:'USD' }}</p>
+          <p class="text-2xl font-bold">{{ account()?.balance | currency: (account()?.currency || 'USD') }}</p>
         </div>
       </div>
 
@@ -64,8 +64,8 @@ import { TransactionHistoryTableComponent } from '../../../../components/transac
 })
 export class TransactionHistoryComponent implements OnInit {
   user = signal<User | null>(null);
-  accounts = signal<Account[]>([]);
-  account = signal<Account | undefined>(undefined);
+  accounts = signal<BankAccount[]>([]);
+  account = signal<BankAccount | undefined>(undefined);
   transactions = signal<Transaction[]>([]);
   currentPage = signal<number>(1);
 
@@ -99,19 +99,23 @@ export class TransactionHistoryComponent implements OnInit {
   }
 
   private loadData(idParam?: string) {
-    this.accountsSvc.getAll().subscribe(accs => {
+    this.accountsSvc.getAll().subscribe((accs) => {   
       this.accounts.set(accs);
 
-      const fallback = accs[0]?.appwriteItemId || accs[0]?.id;
+      if (!accs.length) {                              
+        this.account.set(undefined);
+        this.transactions.set([]);
+        return;
+      }
+
+      const fallback = accs[0].id;                   
       this.selectedId = idParam || fallback;
 
-      const found =
-        accs.find(a => a.appwriteItemId === this.selectedId || a.id === this.selectedId) || accs[0];
+      const found = accs.find(a => a.id === this.selectedId) || accs[0]; // ✅
       this.account.set(found);
 
-      this.txSvc.listByAccountId(found.id).subscribe(txs => this.transactions.set(txs));
-
-
+      this.txSvc.listByAccount(found.id)               
+        .subscribe(txs => this.transactions.set(txs));
     });
   }
 }

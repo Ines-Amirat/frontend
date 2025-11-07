@@ -1,26 +1,27 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
-import { Transaction } from '../models';
+import { BankAccount, Transaction, UUID } from '../models';
 import { environment } from '../../../environments/environments';
 
 @Injectable({ providedIn: 'root' })
 export class TransactionsService {
-  private base = environment.apiBaseUrl;
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  private base = `${environment.apiBaseUrl}/transactions`;
 
-  listByAccountId(accountId?: string): Observable<Transaction[]> {
-    if (environment.useMock) {
-      return this.http.get<Transaction[]>('assets/mocks/transactions.json').pipe(
-        map(txs => {
-          const data = accountId ? txs.filter(t => t.accountId === accountId) : txs;
-          return data.sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-        })
-      );
-    }
-    let params = new HttpParams();
-    if (accountId) params = params.set('accountId', accountId);
-    return this.http.get<Transaction[]>(`${this.base}/transactions`, { params });
+  listByAccount(accountId: UUID) {
+    const params = new HttpParams().set('accountId', accountId);
+    return this.http.get<Transaction[]>(this.base, { params });
+  }
+  
+  create(payload: {
+    accountId: UUID;
+    direction: 'CREDIT' | 'DEBIT';
+    amount: number;
+    channel?: string;
+    category?: string;
+    description?: string;
+  }) {
+    return this.http.post<Transaction>(this.base, payload);
   }
 }
 

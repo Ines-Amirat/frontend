@@ -2,14 +2,13 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-
-
-
 import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-box.component';
-import { Account, Transaction, User } from '../../../../core/models';
+import {  BankAccount, Transaction, User } from '../../../../core/models';
 import { RecentTransactionsComponent } from '../../../../components/transaction/recent-transactions/recent-transactions.component';
 import { TotalBalanceBoxComponent } from '../../../../components/ui/total-balance-box/total-balance-box.component';
 import { RightSidebarComponent } from '../../../../components/right-sidebar/right-sidebar.component';
+import { AccountsService } from '../../../../core/services/accounts.service';
+import { TransactionsService } from '../../../../core/services/transaction.service';
 @Component({
   selector: 'app-home',
   standalone: true,
@@ -54,6 +53,12 @@ import { RightSidebarComponent } from '../../../../components/right-sidebar/righ
 })
 export class HomeComponent implements OnInit {
 
+
+  constructor(
+  private accSvc: AccountsService,
+  private txSvc: TransactionsService
+) {}
+
   // 💡 Fake signals pour le mode hors-backend
   user = signal<User | null>({
     $id: 'u1',
@@ -71,86 +76,45 @@ export class HomeComponent implements OnInit {
     ssn: '1111'
   });
 
-  accounts = signal<Account[]>([]);
+  accounts = signal<BankAccount[]>([]);
   selectedAccount = signal<{ transactions: Transaction[] } | null>(null);
   totals = signal({ totalBanks: 0, totalCurrentBalance: 0 });
   page = signal(1);
   itemId = signal<string>('');
 
-  async ngOnInit() {
-    // ✅ données simulées
-    const mockAccounts: Account[] = [
-      {
-        id: 'a1',
-        availableBalance: 1200,
-        currentBalance: 1500,
-        officialName: 'Main Checking',
-        mask: '1234',
-        institutionId: 'bank_001',
-        name: 'BNP Paribas',
-        type: 'depository',
-        subtype: 'checking',
-        appwriteItemId: 'item_001',
-        sharableId: 'sharable_001'
-      },
-      {
-        id: 'a2',
-        availableBalance: 800,
-        currentBalance: 1000,
-        officialName: 'Savings Account',
-        mask: '5678',
-        institutionId: 'bank_002',
-        name: 'Société Générale',
-        type: 'depository',
-        subtype: 'savings',
-        appwriteItemId: 'item_002',
-        sharableId: 'sharable_002'
-      }
-    ];
+  
 
-    const mockTransactions: Transaction[] = [
-      {
-        id: 't1',
-        $id: 't1',
-        name: 'Payment - Amazon',
-        paymentChannel: 'online',
-        type: 'debit',
-        accountId: 'a1',
-        amount: 85.99,
-        pending: false,
-        category: 'Shopping',
-        date: '2025-11-01',
-        image: '',
-        $createdAt: '2025-11-01',
-        channel: 'online',
-        senderBankId: 'a1',
-        receiverBankId: 'a2'
-      },
-      {
-        id: 't2',
-        $id: 't2',
-        name: 'Salary - Company',
-        paymentChannel: 'deposit',
-        type: 'credit',
-        accountId: 'a1',
-        amount: 2000,
-        pending: false,
-        category: 'Income',
-        date: '2025-10-29',
-        image: '',
-        $createdAt: '2025-10-29',
-        channel: 'deposit',
-        senderBankId: 'a2',
-        receiverBankId: 'a1'
-      }
-    ];
+ngOnInit() {
+  this.accSvc.getAll().subscribe({
+    next: (accs) => {
+      this.accounts.set(accs);
 
-    this.accounts.set(mockAccounts);
-    this.totals.set({
-      totalBanks: mockAccounts.length,
-      totalCurrentBalance: mockAccounts.reduce((sum, acc) => sum + acc.currentBalance, 0)
-    });
-    this.selectedAccount.set({ transactions: mockTransactions });
-    this.itemId.set(mockAccounts[0].appwriteItemId);
-  }
+      this.totals.set({
+        totalBanks: accs.length,
+        totalCurrentBalance: accs.reduce((s, a) => s + (a.balance || 0), 0),
+      });
+
+      const first = accs[0];
+      if (!first) {
+        this.itemId.set('');
+        this.selectedAccount.set({ transactions: [] });
+        return;
+      }
+
+      this.itemId.set(first.id);                   // use backend id
+      this.txSvc.listByAccount(first.id).subscribe({
+        next: (txs) => this.selectedAccount.set({ transactions: txs }),
+        error: () => this.selectedAccount.set({ transactions: [] }),
+      });
+    },
+    error: () => {
+      this.accounts.set([]);
+      this.itemId.set('');
+      this.selectedAccount.set({ transactions: [] });
+      this.totals.set({ totalBanks: 0, totalCurrentBalance: 0 });
+    },
+  });
+}
+
+
 }

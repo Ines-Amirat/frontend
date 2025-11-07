@@ -49,37 +49,41 @@ export interface NewUserParams {
   password: string;
 }
 
-export interface Account {
-  id: string;
-  availableBalance: number;
-  currentBalance: number;
-  officialName: string;
-  mask: string;
-  institutionId: string;
-  name: string;
-  type: string;
-  subtype: string;
-  appwriteItemId: string;
-  sharableId: string;
-}
+
 
 export interface Transaction {
   id: string;
-  $id: string;
-  name: string;
-  paymentChannel: string;
-  type: string;
   accountId: string;
+  direction: 'CREDIT' | 'DEBIT';
   amount: number;
-  pending: boolean;
-  category: string;
-  date: string;
-  image: string;
-  $createdAt: string;
-  channel: string;
-  senderBankId: string;
-  receiverBankId: string;
+  status: 'SUCCESS' | 'PENDING' | 'FAILED';   
+  channel?: string;       
+  category?: string;       
+  description?: string;   
+  occurredAt: string;     
+  name?: string;
+  image?: string;
 }
+
+
+export type UUID = string;
+
+export interface BankAccount {
+  id: UUID;
+  userId: UUID;
+  name: string;
+  bankName: string;
+  type: 'CHECKING' | 'SAVINGS' | 'CREDIT';
+  currency: string;
+  balance: number;
+  createdAt: string;
+  updatedAt: string;
+  maskedNumber?: string;
+  iban?: string;
+}
+
+
+
 
 export interface Bank {
   $id: string;
@@ -90,6 +94,8 @@ export interface Bank {
   userId: string;
   sharableId: string;
 }
+
+
 
 export type AccountTypes = 'depository' | 'credit' | 'loan ' | 'investment' | 'other';
 
@@ -134,13 +140,13 @@ export interface NewDwollaCustomerParams {
 // Props-equivalents for Angular components
 
 export interface CreditCardProps {
-  account: Account;
+  account: BankAccount;
   userName: string;
   showBalance?: boolean;
 }
 
 export interface BankInfoProps {
-  account: Account;
+  account: BankAccount;
   appwriteItemId?: string;
   type: 'full' | 'card';
 }
@@ -180,18 +186,18 @@ export interface AuthFormProps {
 }
 
 export interface BankDropdownProps {
-  accounts: Account[];
+  accounts: BankAccount[];
   // setValue is React-specific in Next.js; omit or adapt for Angular forms as needed.
   otherStyles?: string;
 }
 
 export interface BankTabItemProps {
-  account: Account;
+  account: BankAccount;
   appwriteItemId?: string;
 }
 
 export interface TotlaBalanceBoxProps {
-  accounts: Account[];
+  accounts: BankAccount[];
   totalBanks: number;
   totalCurrentBalance: number;
 }
@@ -203,7 +209,7 @@ export interface FooterProps {
 export interface RightSidebarProps {
   user: User;
   transactions: Transaction[];
-  banks: Array<Bank & Account>; // mirrors Next.js `Bank[] & Account[]`
+  banks: Array<Bank & BankAccount>; // mirrors Next.js `Bank[] & Account[]`
 }
 
 export interface SiderbarProps {
@@ -211,7 +217,7 @@ export interface SiderbarProps {
 }
 
 export interface RecentTransactionsProps {
-  accounts: Account[];
+  accounts: BankAccount[];
   transactions: Transaction[];
   appwriteItemId: string;
   page: number;
@@ -235,11 +241,11 @@ export interface CategoryProps {
 }
 
 export interface DoughnutChartProps {
-  accounts: Account[];
+  accounts: BankAccount[];
 }
 
 export interface PaymentTransferFormProps {
-  accounts: Account[];
+  accounts: BankAccount[];
 }
 
 // Actions
@@ -315,3 +321,7 @@ export interface GetBankProps {
 export interface GetBankByAccountIdProps {
   accountId: string;
 }
+
+
+
+

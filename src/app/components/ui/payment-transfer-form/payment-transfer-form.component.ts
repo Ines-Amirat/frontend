@@ -7,6 +7,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { BankDropdownComponent, type Account as BankOption } from '../../bank/bank-drop-dwon/bank-drop-dwon.component';
 import { FormFieldComponent } from '../form/form.component';
+import { BankAccount } from '../../../core/models';
 
 // === Ton dropdown (tel que tu l'as envoyé, sélecteur <app-bank-dropdown>) ===
 
@@ -220,7 +221,9 @@ class TransactionsApi {
   `,
 })
 export class PaymentTransferFormComponent {
-  @Input({ required: true }) accounts: BankOption[] = [];
+ 
+  @Input({ required: true }) accounts: BankAccount[] = [];
+
 
 
   private fb = inject(FormBuilder);

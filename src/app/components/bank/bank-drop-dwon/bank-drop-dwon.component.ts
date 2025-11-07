@@ -2,6 +2,9 @@
 import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { BankAccount } from '../../../core/models';
+
+
 
 export interface Account {
   id: string;
@@ -30,12 +33,12 @@ export type BankDropdownProps = {
         <select
           class="flex h-10 w-full md:w-[300px] items-center rounded-md border border-slate-200 bg-white px-3 py-2 text-sm outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950"
           [ngClass]="otherStyles"
-          [value]="selected()?.appwriteItemId || ''"
+          [value]="selected()?.id || ''"
           (change)="onSelectChange($event)"
         >
           <option value="" disabled hidden>Select a bank to display</option>
-          <option *ngFor="let a of accounts" [value]="a.appwriteItemId">
-            {{ a.name }} — {{ formatAmount(a.currentBalance) }}
+          <option *ngFor="let a of accounts" [value]="a.id">
+            {{ a.name }} — {{ formatAmount(a.balance, a.currency) }}
           </option>
         </select>
 
@@ -55,37 +58,40 @@ export type BankDropdownProps = {
   `,
 })
 export class BankDropdownComponent implements OnInit, OnChanges {
-  @Input() accounts: Account[] = [];
+  @Input() accounts: BankAccount[] = [];
   @Input() setValue?: (name: string, value: string) => void;
   @Input() otherStyles = '';
 
-  @Output() changed = new EventEmitter<Account>();
 
-  private _selected = signal<Account | null>(null);
+  @Output() changed = new EventEmitter<BankAccount>();
+
+
+  
+  private _selected = signal<BankAccount | null>(null);
   selected = computed(() => this._selected());
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
 
+
+  constructor(private router: Router, private route: ActivatedRoute) {}
+  
   ngOnInit(): void {
     const fromQuery = this.route.snapshot.queryParamMap.get('id');
     // priorité à l'URL si id présent
     if (fromQuery && this.accounts?.length) {
-      const found = this.accounts.find(a => a.appwriteItemId === fromQuery) || null;
+      const found = this.accounts.find(a => a.id === fromQuery) || null;
       this._selected.set(found ?? this.accounts[0] ?? null);
     } else {
       this._selected.set(this.accounts[0] ?? null);
     }
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
+    ngOnChanges(changes: SimpleChanges): void {
     if (changes['accounts'] && this.accounts?.length) {
-      // si rien de sélectionné, ou sélection devenue invalide, reprendre le 1er
       const cur = this._selected();
-      if (!cur || !this.accounts.some(a => a.appwriteItemId === cur.appwriteItemId)) {
-        // si l'URL contient déjà un id valide, on garde la logique d'init
+      if (!cur || !this.accounts.some(a => a.id === cur.id)) {
         const fromQuery = this.route.snapshot.queryParamMap.get('id');
         if (fromQuery) {
-          const found = this.accounts.find(a => a.appwriteItemId === fromQuery) || null;
+          const found = this.accounts.find(a => a.id === fromQuery) || null;
           this._selected.set(found ?? this.accounts[0] ?? null);
         } else {
           this._selected.set(this.accounts[0] ?? null);
@@ -96,17 +102,14 @@ export class BankDropdownComponent implements OnInit, OnChanges {
 
   onSelectChange(event: Event) {
     const id = (event.target as HTMLSelectElement).value;
-    const acc = this.accounts.find(a => a.appwriteItemId === id);
+    const acc = this.accounts.find(a => a.id === id);
     if (!acc) return;
 
     this._selected.set(acc);
-
-    // équivalent de formUrlQuery + router.push(newUrl, { scroll: false })
     this.router.navigate([], {
       relativeTo: this.route,
       queryParams: { id },
       queryParamsHandling: 'merge',
-      // Angular gère le scroll selon ta config; on n’impose rien ici
     });
 
     if (this.setValue) {
@@ -115,6 +118,7 @@ export class BankDropdownComponent implements OnInit, OnChanges {
 
     this.changed.emit(acc);
   }
+
 
   formatAmount(amount: number, currency = 'EUR', locale = 'fr-FR') {
     try {
@@ -128,4 +132,6 @@ export class BankDropdownComponent implements OnInit, OnChanges {
       return `${amount?.toFixed?.(2) ?? '0.00'} ${currency}`;
     }
   }
+
+  
 }

@@ -1,19 +1,27 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-
-import { Account } from '../models';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { BankAccount, UUID } from '../models';
 import { environment } from '../../../environments/environments';
 
 @Injectable({ providedIn: 'root' })
 export class AccountsService {
-  private base = environment.apiBaseUrl;
-  constructor(private http: HttpClient) {}
+  private http = inject(HttpClient);
+  private base = `${environment.apiBaseUrl}/accounts`;
 
-  getAll(): Observable<Account[]> {
-    if (environment.useMock) {
-      return this.http.get<Account[]>('assets/mocks/accounts.json');
-    }
-    return this.http.get<Account[]>(`${this.base}/accounts`);
+  listByUser(userId: UUID) {
+    const params = new HttpParams().set('userId', userId);
+    return this.http.get<BankAccount[]>(this.base, { params });
   }
+
+  get(id: UUID) {
+    return this.http.get<BankAccount>(`${this.base}/${id}`);
+  }
+
+  getAll() {
+  return this.http.get<BankAccount[]>('/api/accounts');
+}
+
+
+  
+
 }

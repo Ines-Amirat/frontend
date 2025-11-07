@@ -34,7 +34,7 @@ import { FormatDateTimePipe } from "../../../core/pipes/format-date-time.pipe";
           <td class="max-w-[250px] pl-2 pr-10 py-3">
             <div class="flex items-center gap-3">
               <h1 class="text-14 truncate font-semibold text-[#344054]">
-                {{ removeSpecialCharacters(t.name) }}
+                {{removeSpecialCharacters(t.description || '') }}
               </h1>
             </div>
           </td>
@@ -47,20 +47,20 @@ import { FormatDateTimePipe } from "../../../core/pipes/format-date-time.pipe";
 
         
         <td>
-  <app-category-badge [category]="t.date | transactionStatus"></app-category-badge>
+  <app-category-badge [category]="t.occurredAt | transactionStatus"></app-category-badge>
 </td>
 
 <td>
-  {{ t.date | formatDateTime }}
+  {{ t.occurredAt | formatDateTime }}
 </td>
           <!-- Channel -->
           <td class="min-w-24 pl-2 pr-10 py-3 capitalize max-md:hidden">
-            {{ t.paymentChannel }}
+            {{ t.channel }}
           </td>
 
           <!-- Category -->
           <td class="pl-2 pr-10 py-3 max-md:hidden">
-            <app-category-badge [category]="t.category" />
+            <app-category-badge [category]="t.category ? t.category : 'OTHER'"></app-category-badge>
           </td>
         </tr>
       </tbody>
@@ -76,11 +76,13 @@ export class TransactionTableComponent {
   removeSpecialCharacters = removeSpecialCharacters;
   getTransactionStatus = getTransactionStatus;
 
-  trackById = (_: number, t: Transaction) => t.id ?? t.$id;
+ 
+  trackById = (_: number, t: Transaction) => t.id;
+
 
   rowClass(t: Transaction) {
     const amt = formatAmount(t.amount);
-    const isDebit = t.type === 'debit' || amt.startsWith('-');
+    const isDebit = t.description === 'debit' || amt.startsWith('-');
     return this.cn(
       isDebit ? 'bg-[#FFFBFA]' : 'bg-[#F6FEF9]',
       '!over:bg-none', // gardé pour rester fidèle au style original
@@ -90,14 +92,14 @@ export class TransactionTableComponent {
 
   amountClass(t: Transaction) {
     const amt = formatAmount(t.amount);
-    const isDebit = t.type === 'debit' || amt.startsWith('-');
+    const isDebit = t.description === 'debit' || amt.startsWith('-');
     return isDebit ? 'text-[#F04438]' : 'text-[#039855]';
   }
 
   displayAmount(t: Transaction) {
     const amt = formatAmount(t.amount);
-    if (t.type === 'debit') return `-${amt}`;
-    if (t.type === 'credit') return amt;
+    if (t.description === 'debit') return `-${amt}`;
+    if (t.description === 'credit') return amt;
     return amt;
     // (même logique que React; adapte si ton backend donne déjà un signe)
   }

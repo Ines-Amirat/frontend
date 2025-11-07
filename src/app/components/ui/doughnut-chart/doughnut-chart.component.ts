@@ -3,7 +3,7 @@ import { Component, Input, OnInit, OnChanges, SimpleChanges, ViewChild } from '@
 import { CommonModule } from '@angular/common';
 import { Chart, DoughnutController, ArcElement, Tooltip, Legend, ChartConfiguration, ChartData } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { Account } from '../../../core/models';
+import {  BankAccount } from '../../../core/models';
 
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
 
@@ -19,7 +19,7 @@ Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
   `,
 })
 export class DoughnutChartComponent implements OnInit, OnChanges {
-  @Input() accounts: Account[] = [];
+  @Input() accounts: BankAccount[] = [];
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
 
   type: 'doughnut' = 'doughnut';
@@ -58,8 +58,8 @@ export class DoughnutChartComponent implements OnInit, OnChanges {
   ngOnChanges(_: SimpleChanges) { this.rebuild(); }
 
   private rebuild() {
-    const balances = (this.accounts ?? []).map(a => a.currentBalance ?? 0);
-    const labels   = (this.accounts ?? []).map(a => a.name || a.officialName || 'Account');
+    const balances = (this.accounts ?? []).map(a => a.balance ?? 0);
+    const labels   = (this.accounts ?? []).map(a => a.name || a.name || 'Account');
 
     // avoid empty canvas
     const data = balances.length ? balances : [1];

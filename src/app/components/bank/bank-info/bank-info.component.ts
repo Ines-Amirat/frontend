@@ -2,7 +2,7 @@
 import { Component, Input, computed, inject } from '@angular/core';
 import { CommonModule, NgOptimizedImage } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Account, AccountTypes } from '../../../core/models';
+import {  AccountTypes, BankAccount } from '../../../core/models';
 import { formatAmount, getAccountTypeColors } from '../../../core/utils/utils';
 
 
@@ -25,7 +25,7 @@ import { formatAmount, getAccountTypeColors } from '../../../core/utils/utils';
           ngSrc="icons/connect-bank.svg"
           width="20"
           height="20"
-          [alt]="account?.subtype || 'bank icon'"
+          [alt]="account?.type || 'bank icon'"
           class="m-2 min-w-5"
         />
       </figure>
@@ -44,12 +44,12 @@ import { formatAmount, getAccountTypeColors } from '../../../core/utils/utils';
             class="text-12 rounded-full px-3 py-1 font-medium text-blue-700"
             [ngClass]="[colors().subText, colors().lightBg]"
           >
-            {{ account?.subtype }}
+            {{ account?.type }}
           </p>
         </div>
 
         <p class="text-16 font-medium text-blue-700" [ngClass]="colors().subText">
-          {{ formatAmount(account?.currentBalance || 0) }}
+          {{ formatAmount(account?.balance || 0) }}
         </p>
       </div>
     </div>
@@ -59,23 +59,23 @@ export class BankInfoComponent {
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
-  @Input({ required: true }) account!: Account;
+  @Input({ required: true }) account!: BankAccount;
   @Input({ required: true }) appwriteItemId!: string;
   @Input() type: 'full' | 'card' = 'full';
 
   formatAmount = formatAmount;
 
-  isActive = computed(() => this.appwriteItemId === this.account?.appwriteItemId);
+  isActive = computed(() => this.appwriteItemId === this.account?.id);
 
   colors = computed(() =>
     getAccountTypeColors((this.account?.type as AccountTypes) || 'other' as AccountTypes)
   );
 
   handleBankChange() {
-    if (!this.account?.appwriteItemId) return;
+    if (!this.account?.id) return;
     this.router.navigate([], {
       relativeTo: this.route,
-      queryParams: { id: this.account.appwriteItemId },
+      queryParams: { id: this.account.id},
       queryParamsHandling: 'merge',
       replaceUrl: true,   // évite l’historique inutile (comportement proche de Next router.push(..., {scroll:false}))
     });

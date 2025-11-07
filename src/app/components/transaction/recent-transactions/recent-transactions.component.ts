@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
 import { BankInfoComponent } from '../../bank/bank-info/bank-info.component';
-import { Account, Transaction } from '../../../core/models';
+import {  BankAccount, Transaction } from '../../../core/models';
 import { TransactionTableComponent } from '../transaction-table/transaction-table.component';
 import { BankTabItemComponent } from '../../bank/bank-tab-item/bank-tab-item.component';
 import { PaginationComponent } from '../../ui/pagination/pagination.component';
@@ -42,8 +42,8 @@ import { PaginationComponent } from '../../ui/pagination/pagination.component';
             *ngFor="let acc of accounts"
             type="button"
             class="px-2 py-1"
-            [class.bg-bank-gradient]="selectedId === acc.appwriteItemId"
-            (click)="selectTab(acc.appwriteItemId)"
+            [class.bg-bank-gradient]="selectedId === acc.id"
+            (click)="selectTab(acc.id)"
           >
             <app-bank-tab-item
               [account]="acc"
@@ -56,7 +56,7 @@ import { PaginationComponent } from '../../ui/pagination/pagination.component';
         <ng-container *ngFor="let acc of accounts">
           <div
             class="space-y-4"
-            *ngIf="selectedId === acc.appwriteItemId"
+            *ngIf="selectedId === acc.id"
           >
             <app-bank-info
               [account]="acc"
@@ -81,7 +81,7 @@ import { PaginationComponent } from '../../ui/pagination/pagination.component';
   `,
 })
 export class RecentTransactionsComponent implements OnChanges {
-  @Input() accounts: Account[] = [];
+  @Input() accounts: BankAccount[] = [];
   @Input() transactions: Transaction[] = [];
   @Input() appwriteItemId: string = '';
   @Input() page = 1;
@@ -99,7 +99,7 @@ export class RecentTransactionsComponent implements OnChanges {
 
     // Sélection par défaut
     if (!this.selectedId) {
-      this.selectedId = this.appwriteItemId || this.accounts[0]?.appwriteItemId || '';
+      this.selectedId = this.appwriteItemId || this.accounts[0]?.id || '';
     }
   }
 

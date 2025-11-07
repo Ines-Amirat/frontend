@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 
 import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-box.component';
 import { BankCardComponent } from '../../../../components/bank/bank-card/bank-card.component';
-import { Account, User } from '../../../../core/models';
+import {  BankAccount, User } from '../../../../core/models';
 import { AccountsService } from '../../../../core/services/accounts.service';
 import { AuthServiceService } from '../../../../core/services/auth-service.service';
 
@@ -51,14 +51,18 @@ import { AuthServiceService } from '../../../../core/services/auth-service.servi
 })
 export class MyBanksComponent implements OnInit {
   user = signal<User | null>(null);
-  accounts = signal<Account[]>([]);
+  accounts = signal<BankAccount[]>([]);
+
   loading = signal(true);
   error = signal('');
 
   totalBanks = computed(() => this.accounts().length);
+  
+
   totalCurrentBalance = computed(() =>
-    this.accounts().reduce((sum, a) => sum + Number(a.currentBalance || 0), 0)
-  );
+  this.accounts().reduce((sum, a) => sum + Number(a.balance || 0), 0)
+);
+
 
   constructor(
     private auth: AuthServiceService,
@@ -71,11 +75,22 @@ export class MyBanksComponent implements OnInit {
     if (!u) { this.router.navigate(['/sign-in']); return; }
     this.user.set(u);
 
-    this.accountsSvc.getAll().subscribe({
-      next: (data) => { this.accounts.set(data); this.loading.set(false); },
-      error: () => { this.error.set('Failed to load accounts'); this.loading.set(false); }
-    });
+    const userId = (u as any).id || (u as any).userId || (u as any).$id;
+
+
+    this.accountsSvc.listByUser(userId).subscribe({
+    next: (data) => { this.accounts.set(data); this.loading.set(false); },
+    error: () => { this.error.set('Failed to load accounts'); this.loading.set(false); }
+  });
+
+    
   }
+
+  
+
+
+
+
 }
 
 

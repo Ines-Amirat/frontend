@@ -2,7 +2,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BankCardComponent } from '../bank/bank-card/bank-card.component';
-import { Account, CategoryCount, Transaction, User } from '../../core/models';
+import {  BankAccount, CategoryCount, Transaction, User } from '../../core/models';
 import { countTransactionCategories } from '../../core/utils/utils';
 import { CategoryComponent } from '../ui/category/category.component';
 
@@ -80,7 +80,7 @@ import { CategoryComponent } from '../ui/category/category.component';
 export class RightSidebarComponent implements OnInit {
   @Input() user!: User;
   @Input() transactions: Transaction[] = [];
-  @Input({ required: true }) banks!: Account[];
+  @Input({ required: true }) banks!: BankAccount[];
 
 
 
