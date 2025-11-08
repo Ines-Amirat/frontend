@@ -4,13 +4,13 @@ import { Router } from '@angular/router';
 
 import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-box.component';
 import { BankCardComponent } from '../../../../components/bank/bank-card/bank-card.component';
-import {  BankAccount, User } from '../../../../core/models';
+import { BankAccount, User } from '../../../../core/models';
 import { AccountsService } from '../../../../core/services/accounts.service';
 import { AuthServiceService } from '../../../../core/services/auth-service.service';
 
 @Component({
   selector: 'app-my-banks',
-  standalone: true,                       
+  standalone: true,
   imports: [CommonModule, CurrencyPipe, HeaderBoxComponent, BankCardComponent],
   template: `
     <section class="flex">
@@ -57,40 +57,36 @@ export class MyBanksComponent implements OnInit {
   error = signal('');
 
   totalBanks = computed(() => this.accounts().length);
-  
+
 
   totalCurrentBalance = computed(() =>
-  this.accounts().reduce((sum, a) => sum + Number(a.balance || 0), 0)
-);
+    this.accounts().reduce((sum, a) => sum + Number(a.balance || 0), 0)
+  );
 
 
   constructor(
     private auth: AuthServiceService,
     private accountsSvc: AccountsService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     const u = this.auth.user();
     if (!u) { this.router.navigate(['/sign-in']); return; }
     this.user.set(u);
 
-    const userId = (u as any).id || (u as any).userId || (u as any).$id;
-
+    // ✅ on force un UUID correct (même que Transaction History)
+    const userId = (u as any).id && String((u as any).id).includes('-')
+      ? (u as any).id
+      : '11111111-1111-1111-1111-111111111111';
 
     this.accountsSvc.listByUser(userId).subscribe({
-    next: (data) => { this.accounts.set(data); this.loading.set(false); },
-    error: () => { this.error.set('Failed to load accounts'); this.loading.set(false); }
-  });
-
-    
+      next: (data) => { this.accounts.set(data); this.loading.set(false); },
+      error: () => { this.error.set('Failed to load accounts'); this.loading.set(false); }
+    });
   }
 
-  
-
-
-
-
 }
+
 
 

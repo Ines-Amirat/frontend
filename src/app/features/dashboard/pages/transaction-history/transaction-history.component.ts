@@ -7,7 +7,7 @@ import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-
 import { AuthServiceService } from '../../../../core/services/auth-service.service';
 import { AccountsService } from '../../../../core/services/accounts.service';
 import { TransactionsService } from '../../../../core/services/transaction.service';
-import {  BankAccount, Transaction, User } from '../../../../core/models';
+import { BankAccount, Transaction, User } from '../../../../core/models';
 import { BankDropdownComponent } from '../../../../components/bank/bank-drop-dwon/bank-drop-dwon.component';
 import { TransactionHistoryTableComponent } from '../../../../components/transactions/transaction-history-table/transaction-history-table.component';
 
@@ -18,7 +18,7 @@ import { TransactionHistoryTableComponent } from '../../../../components/transac
     CommonModule, CurrencyPipe, DatePipe,
     HeaderBoxComponent, BankDropdownComponent, TransactionHistoryTableComponent
   ],
-  template: `
+  template: `<!-- ton template inchangé --> 
   <section class="transactions">
     <div class="transactions-header">
       <app-header-box
@@ -26,26 +26,17 @@ import { TransactionHistoryTableComponent } from '../../../../components/transac
         [subtext]="'See your bank details and transactions.'">
       </app-header-box>
 
-      <!-- équivalent BankDropdown -->
-     
-
-
       <app-bank-dropdown
         [accounts]="accounts()" (changed)="onSelectAccountId($event.id)">
-        
-
-</app-bank-dropdown>
-
+      </app-bank-dropdown>
     </div>
 
     <div class="space-y-6">
-      <!-- bandeau compte -->
       <div class="transactions-account rounded-xl bg-blue-600 text-white p-5 flex items-center justify-between">
         <div class="flex flex-col gap-2">
           <h2 class="text-lg font-bold">{{ account()?.name || '—' }}</h2>
           <p class="text-sm text-blue-100">{{ account()?.bankName || '—' }}</p>
           <p class="text-sm font-medium text-blue-100">●●●● ●●●● ●●●● {{ account()?.maskedNumber }}</p>
-
         </div>
         <div class="transactions-account-balance text-right">
           <p class="text-sm">Current Balance</p>
@@ -53,7 +44,6 @@ import { TransactionHistoryTableComponent } from '../../../../components/transac
         </div>
       </div>
 
-      <!-- équivalent TransactionHistoryTable -->
       <app-transaction-history-table
         [page]="currentPage()"
         [transactions]="transactions()">
@@ -79,43 +69,61 @@ export class TransactionHistoryComponent implements OnInit {
     private txSvc: TransactionsService
   ) { }
 
-  ngOnInit(): void {
+  // ✅ Fallback: si l’AuthService n’a pas d’id, on met un mock UUID (comme Home)
+  private getUserId(): string | null {
     const u = this.auth.user();
-    if (!u) { this.router.navigate(['/sign-in']); return; }
-    this.user.set(u);
+    if (u?.id) return u.id as unknown as string;
+    if (u && (u as any).userId) return (u as any).userId; // si jamais
+    // MOCK (à supprimer quand l’auth sera branchée)
+    return '11111111-1111-1111-1111-111111111111';
+  }
+
+  ngOnInit(): void {
+    const uid = this.getUserId();
+    if (!uid) { this.router.navigate(['/sign-in']); return; }
+
+    // garde une copie locale de l’utilisateur si besoin pour l’UI
+    this.user.set(this.auth.user() ?? { firstName: 'User' } as any);
 
     this.route.queryParamMap.subscribe(params => {
       const pageNum = Number(params.get('page') || '1');
       this.currentPage.set(Number.isFinite(pageNum) && pageNum > 0 ? pageNum : 1);
 
       const idParam = params.get('id') || undefined;
-      this.loadData(idParam);
+      this.loadData(uid, idParam);
     });
   }
 
   onSelectAccountId(id: string) {
-    // met à jour ?id=... comme dans Next.js
     this.router.navigate([], { queryParams: { id }, queryParamsHandling: 'merge' });
   }
 
-  private loadData(idParam?: string) {
-    this.accountsSvc.getAll().subscribe((accs) => {   
-      this.accounts.set(accs);
+  private loadData(userId: string, idParam?: string) {
+    this.accountsSvc.listByUser(userId).subscribe({
+      next: (accs) => {
+        this.accounts.set(accs);
 
-      if (!accs.length) {                              
-        this.account.set(undefined);
-        this.transactions.set([]);
-        return;
-      }
+        if (!accs.length) {
+          this.account.set(undefined);
+          this.transactions.set([]);
+          return;
+        }
 
-      const fallback = accs[0].id;                   
-      this.selectedId = idParam || fallback;
+        const fallback = accs[0].id;
+        this.selectedId = idParam || fallback;
 
-      const found = accs.find(a => a.id === this.selectedId) || accs[0]; // ✅
-      this.account.set(found);
+        const found = accs.find(a => a.id === this.selectedId) || accs[0];
+        this.account.set(found);
 
-      this.txSvc.listByAccount(found.id)               
-        .subscribe(txs => this.transactions.set(txs));
+
+        console.log('ACCOUNT FOUND →', found);          // doit contenir { id: 'xxxxxxxx-xxxx-....' }
+        console.log('CALL TX WITH →', found.id);
+        this.txSvc.listByAccount(found.id).subscribe({
+          next: txs => { console.log('TX OK →', txs); this.transactions.set(txs); },
+          error: e => { console.error('TX ERR →', e); this.transactions.set([]); }
+        });
+      },
+      error: (e) => { console.error('ACCOUNTS error', e); this.accounts.set([]); this.transactions.set([]); }
     });
   }
 }

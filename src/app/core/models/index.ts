@@ -27,7 +27,7 @@ export interface LoginUser {
 }
 
 export interface User {
-  $id: string;
+  id: UUID;   
   email: string;
   userId: string;
   dwollaCustomerUrl: string;

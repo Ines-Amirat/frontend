@@ -39,4 +39,6 @@ export class TotalBalanceBoxComponent {
   get formattedAmount(): string {
     return formatAmount(this.totalCurrentBalance);
   }
+
+  
 }

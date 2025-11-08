@@ -135,6 +135,8 @@ export function countTransactionCategories(transactions: Transaction[] = []): Ca
     totalCount++;
   });
 
+
+  
   const aggregated: CategoryCount[] = Object.keys(categoryCounts).map((key) => ({
     name: key,
     count: categoryCounts[key],

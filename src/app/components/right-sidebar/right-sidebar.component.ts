@@ -1,16 +1,17 @@
 // src/app/components/nav/right-sidebar/right-sidebar.component.ts
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { RouterModule } from '@angular/router';
 import { BankCardComponent } from '../bank/bank-card/bank-card.component';
 import {  BankAccount, CategoryCount, Transaction, User } from '../../core/models';
 import { countTransactionCategories } from '../../core/utils/utils';
 import { CategoryComponent } from '../ui/category/category.component';
+import { CommonModule } from '@angular/common';
 
 
 @Component({
   selector: 'app-right-sidebar',
   standalone: true,
-  imports: [RouterModule, BankCardComponent, CategoryComponent],
+  imports: [RouterModule, BankCardComponent, CategoryComponent,CommonModule],
   template: `
     <aside class="right-sidebar">
       <!-- 🧑‍💼 Profil utilisateur -->
@@ -77,14 +78,11 @@ import { CategoryComponent } from '../ui/category/category.component';
     </aside>
   `,
 })
-export class RightSidebarComponent implements OnInit {
+export class RightSidebarComponent implements OnInit, OnChanges {
   @Input() user!: User;
-  @Input() transactions: Transaction[] = [];
+
+  @Input() transactions: Transaction[] = [];   // <-- reste
   @Input({ required: true }) banks!: BankAccount[];
-
-
-
-
 
   categories: CategoryCount[] = [];
 
@@ -92,7 +90,14 @@ export class RightSidebarComponent implements OnInit {
     this.categories = countTransactionCategories(this.transactions);
   }
 
-  trackByName(_: number, item: CategoryCount) {
-    return item.name;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['transactions']) {
+      this.categories = countTransactionCategories(this.transactions);
+    }
   }
+
+  trackByName(_: number, item: CategoryCount) { return item.name; }
 }
+
+
+

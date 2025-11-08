@@ -9,19 +9,14 @@ export class AccountsService {
   private base = `${environment.apiBaseUrl}/accounts`;
 
   listByUser(userId: UUID) {
-    const params = new HttpParams().set('userId', userId);
+    const params = new HttpParams().set('userId', String(userId)); // 
     return this.http.get<BankAccount[]>(this.base, { params });
   }
+
+  
 
   get(id: UUID) {
     return this.http.get<BankAccount>(`${this.base}/${id}`);
   }
-
-  getAll() {
-  return this.http.get<BankAccount[]>('/api/accounts');
-}
-
-
-  
 
 }

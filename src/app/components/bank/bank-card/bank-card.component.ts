@@ -59,4 +59,6 @@ export class BankCardComponent {
    formatAmount(v: number, ccy: string) {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: ccy || 'USD' }).format(v || 0);
   }
+
+  
 }

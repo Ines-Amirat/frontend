@@ -1,6 +1,8 @@
 // src/app/features/dashboard/pages/home/home.component.ts
 import { Component, OnInit, signal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
 
 import { HeaderBoxComponent } from '../../../../components/ui/header-box/header-box.component';
 import {  BankAccount, Transaction, User } from '../../../../core/models';
@@ -16,7 +18,8 @@ import { TransactionsService } from '../../../../core/services/transaction.servi
     HeaderBoxComponent,
     TotalBalanceBoxComponent,
     RecentTransactionsComponent,
-    RightSidebarComponent
+    RightSidebarComponent,
+    CommonModule
   ],
   template: `
     <section class="home">
@@ -46,22 +49,23 @@ import { TransactionsService } from '../../../../core/services/transaction.servi
       <app-right-sidebar
         [user]="user()!"
         [transactions]="selectedAccount()?.transactions || []"
-        [banks]="accounts().slice(0, 2)"
+        [banks]="accounts().slice(0, 1)"
       />
     </section>
   `
 })
 export class HomeComponent implements OnInit {
 
-
-  constructor(
+  
+constructor(
+  private router: Router,
   private accSvc: AccountsService,
   private txSvc: TransactionsService
 ) {}
 
   // 💡 Fake signals pour le mode hors-backend
   user = signal<User | null>({
-    $id: 'u1',
+    id: '11111111-1111-1111-1111-111111111111',
     email: 'test@demo.com',
     userId: 'u1',
     dwollaCustomerUrl: '',
@@ -83,15 +87,32 @@ export class HomeComponent implements OnInit {
   itemId = signal<string>('');
 
   
+private getUserId(): string | null {
+  const u = this.user();
+  if (!u) return null;
+
+  // tu as les deux: id (UUID) et userId (texte)
+  // on utilise celui que le backend comprend → id (UUID)
+  return u.id ?? null;
+}
+
 
 ngOnInit() {
-  this.accSvc.getAll().subscribe({
+  const userId = this.getUserId();
+  if (!userId) {
+    this.router.navigate(['/sign-in']);
+    return;
+  }
+
+
+  
+  this.accSvc.listByUser(userId).subscribe({
     next: (accs) => {
       this.accounts.set(accs);
 
       this.totals.set({
         totalBanks: accs.length,
-        totalCurrentBalance: accs.reduce((s, a) => s + (a.balance || 0), 0),
+        totalCurrentBalance: accs.reduce((s, a) => s + (a.balance ?? 0), 0),
       });
 
       const first = accs[0];
@@ -101,7 +122,7 @@ ngOnInit() {
         return;
       }
 
-      this.itemId.set(first.id);                   // use backend id
+      this.itemId.set(first.id); // UUID backend
       this.txSvc.listByAccount(first.id).subscribe({
         next: (txs) => this.selectedAccount.set({ transactions: txs }),
         error: () => this.selectedAccount.set({ transactions: [] }),

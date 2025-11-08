@@ -1,9 +1,11 @@
 // src/app/components/common/header-box/header-box.component.ts
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-header-box',
   standalone: true,
+  imports:[CommonModule],
   template: `
     <div class="header-box">
       <h1 class="header-box-title">

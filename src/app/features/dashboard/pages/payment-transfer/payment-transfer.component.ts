@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PaymentTransferFormComponent } from '../../../../components/ui/payment-transfer-form/payment-transfer-form.component';
 import { BankAccount } from '../../../../core/models';
+import { AuthServiceService } from '../../../../core/services/auth-service.service';
+import { AccountsService } from '../../../../core/services/accounts.service';
 
 @Component({
   selector: 'app-payment-transfer-component',
@@ -25,11 +27,30 @@ import { BankAccount } from '../../../../core/models';
     </section>
   `,
 })
+
+
+
 export class PaymentTransferComponent {
   @Input() topTitle = 'Payment Transfer';
   @Input() topDescription = 'Please provide any specific details or notes related to the payment transfer';
   @Input() bottomTitle = 'Transfer details';
   @Input() bottomDescription = 'Enter your transfer details';
 
-  accounts: BankAccount[] = []
+  accounts: BankAccount[] = [];
+
+  constructor(
+    private auth: AuthServiceService,
+    private accountsSvc: AccountsService
+  ) {}
+
+  ngOnInit(): void {
+    const u = this.auth.user();
+    if (!u) return;
+
+    const userId = u.id; 
+    this.accountsSvc.listByUser(userId).subscribe({
+      next: (accs) => this.accounts = accs,
+      error: (err) => console.error('Accounts load error:', err)
+    });
+  }
 }

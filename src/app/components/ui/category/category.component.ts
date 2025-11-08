@@ -13,9 +13,8 @@ import { TOP_CATEGORY_STYLES } from '../../../core/constants';
   template: `
     <div [ngClass]="cn('gap-[18px] flex p-4 rounded-xl', style.bg)">
       <figure [ngClass]="cn('flex-center size-10 rounded-full', style.circleBg)">
-        <img [src]="style.icon" width="20" height="20" [alt]="category.name" />
+         <img src="assets/icons/shopping-bag.svg" width="20" height="20" [alt]="category.name" />
       </figure>
-
       <div class="flex w-full flex-1 flex-col gap-2">
         <div class="text-14 flex justify-between">
           <h2 [ngClass]="cn('font-medium', style.text.main)">
@@ -25,7 +24,6 @@ import { TOP_CATEGORY_STYLES } from '../../../core/constants';
             {{ category.count }}
           </h3>
         </div>
-
         <app-progress
           [value]="progressValue"
           [class.h-2]="true"

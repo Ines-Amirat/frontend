@@ -3,6 +3,7 @@ import { Component, Input, signal } from '@angular/core';
 import { NgClass, NgFor } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FooterComponent, FooterUser } from '../footer/footer.component';
+import { CommonModule } from '@angular/common';
 
 
 type Link = { label: string; route: string; imgURL: string; };
@@ -17,7 +18,7 @@ const LINKS: Link[] = [
 @Component({
   selector: 'app-mobile-nav',
   standalone: true,
-  imports: [NgFor, NgClass, RouterLink, RouterLinkActive, FooterComponent],
+  imports: [NgFor, NgClass, RouterLink, RouterLinkActive, FooterComponent,CommonModule],
   template: `
     <section class="w-full max-w-[264px]">
       <button class="cursor-pointer" (click)="open.set(true)">
